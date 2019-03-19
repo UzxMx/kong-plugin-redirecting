@@ -1,9 +1,9 @@
 package = "kong-plugin-redirecting"
-version = "0.1-1"
+version = "0.1-2"
 supported_platforms = {"linux", "macosx"}
 source = {
   url = "git://github.com/uzxmx/kong-plugin-redirecting",
-  tag = "v0.1-1"
+  tag = "v0.1-2"
 }
 description = {
   summary = "A plugin that redirects to a configured host",

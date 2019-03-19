@@ -1,4 +1,3 @@
-local responses = require "kong.tools.responses"
 local BasePlugin = require "kong.plugins.base_plugin"
 
 local RedirectingHandler = BasePlugin:extend()

@@ -4,19 +4,21 @@ describe("without host set", function()
   local proxy_client
 
   setup(function()
-    local bp = helpers.get_db_utils('postgres')
+    local bp = helpers.get_db_utils('postgres', nil, { "redirecting" })
 
     local route = bp.routes:insert({
       hosts = { "example.com" },
     })
     bp.plugins:insert {
       name = "redirecting",
-      route_id = route.id
+      route = { id = route.id },
+      config = {}
     }
 
     assert(helpers.start_kong({
-      database   = 'postgres',
-      custom_plugins = 'redirecting',
+      database = "postgres",
+      plugins = "bundled, redirecting",
+      custom_plugins = "redirecting",
       nginx_conf = "spec/fixtures/custom_nginx.template"
     }))
 
@@ -33,7 +35,7 @@ describe("without host set", function()
 
   teardown(function()
     if proxy_client then proxy_client:close() end
-    helpers.stop_kong()
+    helpers.stop_kong(nil, true)
   end)
 end)
 
@@ -41,22 +43,23 @@ describe("with host set", function()
   local proxy_client
 
   setup(function()
-    local bp = helpers.get_db_utils('postgres')
+    local bp = helpers.get_db_utils('postgres', nil, { "redirecting" })
 
     local route = bp.routes:insert({
       hosts = { "example.com" },
     })
     bp.plugins:insert {
       name = "redirecting",
-      route_id = route.id,
+      route = { id = route.id },
       config = {
         host = 'redirected.com'
       }
     }
 
     assert(helpers.start_kong({
-      database   = 'postgres',
-      custom_plugins = 'redirecting',
+      database = "postgres",
+      plugins = "bundled, redirecting",
+      custom_plugins = "redirecting",
       nginx_conf = "spec/fixtures/custom_nginx.template"
     }))
 
@@ -83,5 +86,10 @@ describe("with host set", function()
       assert.res_status(301, res)
       assert.equal("http://redirected.com/create", res.headers["Location"])
     end)
+  end)
+
+  teardown(function()
+    if proxy_client then proxy_client:close() end
+    helpers.stop_kong(nil, true)
   end)
 end)
